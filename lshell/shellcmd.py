@@ -1,3 +1,4 @@
+# coding=utf-8
 #
 #  Limited command Shell (lshell)
 #
@@ -153,6 +154,7 @@ class ShellCmd(cmd.Cmd, object):
                                                 self.conf['aliases'])
 
             self.log.info('CMD: "%s"' % self.g_line)
+            self.log.info('我这这里打印一段日志 : "%s"' % self.g_line)
 
             if self.g_cmd == 'cd':
                 # split cd <dir> and rest of command

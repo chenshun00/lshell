@@ -48,5 +48,6 @@ def main():
         userconf['logpath'].error('Timer expired')
         sys.stdout.write('\nTime is up.\n')
 
+
 if __name__ == '__main__':
     main()
