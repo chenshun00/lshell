@@ -264,6 +264,8 @@ class ShellCmd(cmd.Cmd, object):
                         else:
                             # chop \n
                             line = line[:-1]
+                #  log: ps -ef |grep java
+                self.log.info("log: %s" % line)
                 line = self.precmd(line)
                 stop = self.onecmd(line)
                 stop = self.postcmd(stop, line)
@@ -398,6 +400,7 @@ class ShellCmd(cmd.Cmd, object):
         Those variables are then used by the __getattr__ method
         """
         cmd, arg, line = self.parseline(line)
+        self.log.info("start handle line %s " % cmd)
         self.g_cmd, self.g_arg, self.g_line = [cmd, arg, line]
         if not line:
             return self.emptyline()
@@ -409,6 +412,7 @@ class ShellCmd(cmd.Cmd, object):
         else:
             try:
                 func = getattr(self, 'do_' + cmd)
+                print("fuck : %s" % func)
             except AttributeError:
                 return self.default(line)
             return func(arg)
