@@ -154,8 +154,7 @@ class ShellCmd(cmd.Cmd, object):
                                                 self.conf['aliases'])
 
             self.log.info('CMD: "%s"' % self.g_line)
-            self.log.info('我这这里打印一段日志 : "%s"' % self.g_line)
-
+            self.log.info('这里的g_cmd : "%s"' % self.g_cmd)
             if self.g_cmd == 'cd':
                 # split cd <dir> and rest of command
                 cmd_split = re.split(';|&&|&|\|\||\|', self.g_line, 1)
