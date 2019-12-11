@@ -107,7 +107,9 @@ class ShellCmd(cmd.Cmd, object):
             if self.g_cmd == 'EOF':
                 self.stdout.write('\n')
             if self.conf['disable_exit'] != 1:
-                sys.exit(0)
+                # 修复disable_exit没有实现
+                self.retcode = 126
+                return object.__getattribute__(self, attr)
 
         # check that commands/chars present in line are allowed/secure
         ret_check_secure, self.conf = sec.check_secure(
