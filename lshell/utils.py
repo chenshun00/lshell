@@ -89,7 +89,7 @@ def get_aliases(line, aliases):
 def exec_cmd(cmd):
     """ execute a command, locally catching the signals """
     try:
-        proc = subprocess.Popen([cmd], stdout=subprocess.PIPE, shell=True)
+        proc = subprocess.Popen([cmd], shell=True)
         proc.communicate()
         retcode = proc.returncode
     except KeyboardInterrupt:
