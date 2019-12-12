@@ -115,5 +115,6 @@ Cheers
 
 遇到的问题
 ----------------
-Q:lshell默认是 `ASCII` 编码，中文 `UTF-8` 一个汉字需3个字节表示，因此删除一个汉字需要删除3下
+
+Q:lshell默认是 `ASCII` 编码，中文 `UTF-8` 一个汉字需3个字节表示，因此删除一个汉字需要删除3下 <br/>
 A: `export LANG=zh_CN.UTF-8` ， 如果没有 `zh_CN.UTF-8` ，使用 `en_US.UTF-8` 测试也没有问题。
