@@ -109,6 +109,8 @@ class ShellCmd(cmd.Cmd, object):
                 self.stdout.write(
                     'forbidden command: exit , disable_exit is open,please close browser or close shell\n')
                 return object.__getattribute__(self, attr)
+            else:
+                sys.exit(0)
 
         # check that commands/chars present in line are allowed/secure
         # 这里会对allowed里边对命令进行检查 返回0是正常，非0不正常
