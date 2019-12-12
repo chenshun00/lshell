@@ -300,11 +300,12 @@ def check_secure(line, conf, strict=None, ssh=None):
             conf['allowed'] = conf['overssh']
 
         # for all other commands check in allowed list
-        if command not in conf['allowed'] and command:
-            ret, conf = warn_count('command',
-                                   command,
-                                   conf,
-                                   strict=strict,
-                                   ssh=ssh)
-            return ret, conf
+        if 'all' not in conf['allowed']:
+            if command not in conf['allowed'] and command:
+                ret, conf = warn_count('command',
+                                       command,
+                                       conf,
+                                       strict=strict,
+                                       ssh=ssh)
+                return ret, conf
     return 0, conf

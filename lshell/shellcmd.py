@@ -93,13 +93,10 @@ class ShellCmd(cmd.Cmd, object):
         self.g_arg = os.path.expandvars(self.g_arg)
 
         # in case the configuration file has been modified, reload it
-        if self.conf['config_mtime'] != os.path.getmtime(
-                self.conf['configfile']):
+        if self.conf['config_mtime'] != os.path.getmtime(self.conf['configfile']):
             from lshell.checkconfig import CheckConfig
-            self.conf = CheckConfig(['--config', self.conf['configfile']],
-                                    refresh=1).returnconf()
-            self.conf['promptprint'] = utils.updateprompt(os.getcwd(),
-                                                          self.conf)
+            self.conf = CheckConfig(['--config', self.conf['configfile']], refresh=1).returnconf()
+            self.conf['promptprint'] = utils.updateprompt(os.getcwd(), self.conf)
             self.log = self.conf['logpath']
 
         if self.g_cmd in ['quit', 'exit', 'EOF']:
@@ -109,33 +106,29 @@ class ShellCmd(cmd.Cmd, object):
             if self.conf['disable_exit'] != 1:
                 # 修复disable_exit没有实现
                 self.retcode = 126
+                self.stdout.write('forbidden command: exit , disable_exit is open,please close browser or close shell')
                 return object.__getattribute__(self, attr)
 
         # check that commands/chars present in line are allowed/secure
-        ret_check_secure, self.conf = sec.check_secure(
-            self.g_line,
-            self.conf,
-            strict=self.conf['strict'])
+        # 这里会对allowed里边对命令进行检查 返回0是正常，非0不正常
+        ret_check_secure, self.conf = sec.check_secure(self.g_line, self.conf, strict=self.conf['strict'])
         if ret_check_secure == 1:
             # see http://tldp.org/LDP/abs/html/exitcodes.html
             self.retcode = 126
             return object.__getattribute__(self, attr)
 
         # check that path present in line are allowed/secure
-        ret_check_path, self.conf = sec.check_path(self.g_line,
-                                                   self.conf,
-                                                   strict=self.conf['strict'])
+        ret_check_path, self.conf = sec.check_path(self.g_line, self.conf, strict=self.conf['strict'])
         if ret_check_path == 1:
             # see http://tldp.org/LDP/abs/html/exitcodes.html
             self.retcode = 126
             # in case request was sent by WinSCP, return error code has to be
             # sent via an specific echo command
-            if self.conf['winscp'] and re.search('WinSCP: this is end-of-file',
-                                                 self.g_line):
-                utils.exec_cmd('echo "WinSCP: this is end-of-file: %s"'
-                               % self.retcode)
+            if self.conf['winscp'] and re.search('WinSCP: this is end-of-file', self.g_line):
+                utils.exec_cmd('echo "WinSCP: this is end-of-file: %s"' % self.retcode)
             return object.__getattribute__(self, attr)
-        if self.g_cmd in self.conf['allowed'] or 'all' in self.conf['allowed']:
+
+        if self.g_cmd in self.conf['allowed']:
             if self.conf['timer'] > 0:
                 self.mytimer(0)
             self.g_arg = re.sub('^~$|^~/', '%s/' % self.conf['home_path'],
@@ -156,7 +149,6 @@ class ShellCmd(cmd.Cmd, object):
                                                 self.conf['aliases'])
 
             self.log.info('CMD: "%s"' % self.g_line)
-            self.log.info('这里的g_cmd : "%s"' % self.g_cmd)
             if self.g_cmd == 'cd':
                 # split cd <dir> and rest of command
                 cmd_split = re.split(';|&&|&|\|\||\|', self.g_line, 1)
@@ -192,15 +184,12 @@ class ShellCmd(cmd.Cmd, object):
             elif self.g_cmd == 'export':
                 self.retcode, var = builtins.export(self.g_line)
                 if self.retcode == 1:
-                    self.log.critical("** forbidden environment variable '%s'"
-                                      % var)
+                    self.log.critical("** forbidden environment variable '%s'" % var)
             # case 'cd' is in an alias e.g. {'toto':'cd /var/tmp'}
             elif self.g_line[0:2] == 'cd':
                 self.g_cmd = self.g_line.split()[0]
                 directory = ' '.join(self.g_line.split()[1:])
-                self.retcode, self.conf = builtins.cd(directory,
-                                                      self.conf)
-
+                self.retcode, self.conf = builtins.cd(directory, self.conf)
             else:
                 self.retcode = utils.exec_cmd(self.g_line)
 
