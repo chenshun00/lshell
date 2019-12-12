@@ -50,8 +50,8 @@ def warn_count(messagetype, command, conf, strict=None, ssh=None):
                 sys.stderr.write('This incident has been reported.\n')
         else:
             if not conf['quiet']:
-                log.critical('*** forbidden %s: %s'
-                             % (messagetype, command))
+                # output to terminal
+                log.critical('*** forbidden %s: %s' % (messagetype, command))
 
     # if you are here, means that you did something wrong. Return 1.
     return 1, conf
@@ -120,23 +120,14 @@ def check_path(line, conf, completion=None, ssh=None, strict=None):
         # case completion: return 1
         if not match_allowed or match_denied:
             if not completion:
-                ret, conf = warn_count('path',
-                                       tomatch,
-                                       conf,
-                                       strict=strict,
-                                       ssh=ssh)
+                ret, conf = warn_count('path', tomatch, conf, strict=strict, ssh=ssh)
             return 1, conf
 
     if not completion:
         if not re.findall(allowed_path_re, os.getcwd() + '/'):
-            ret, conf = warn_count('path',
-                                   tomatch,
-                                   conf,
-                                   strict=strict,
-                                   ssh=ssh)
+            ret, conf = warn_count('path', tomatch, conf, strict=strict, ssh=ssh)
             os.chdir(conf['home_path'])
-            conf['promptprint'] = utils.updateprompt(os.getcwd(),
-                                                     conf)
+            conf['promptprint'] = utils.updateprompt(os.getcwd(), conf)
             return 1, conf
     return 0, conf
 
@@ -176,30 +167,18 @@ def check_secure(line, conf, strict=None, ssh=None):
 
     # parse command line for control characters, and warn user
     if re.findall(r'[\x01-\x1F\x7F]', oline):
-        ret, conf = warn_count('control char',
-                               oline,
-                               conf,
-                               strict=strict,
-                               ssh=ssh)
+        ret, conf = warn_count('control char', oline, conf, strict=strict, ssh=ssh)
         return ret, conf
 
     for item in conf['forbidden']:
         # allow '&&' and '||' even if singles are forbidden
         if item in ['&', '|']:
             if re.findall("[^\%s]\%s[^\%s]" % (item, item, item), line):
-                ret, conf = warn_count('syntax',
-                                       oline,
-                                       conf,
-                                       strict=strict,
-                                       ssh=ssh)
+                ret, conf = warn_count('syntax', oline, conf, strict=strict, ssh=ssh)
                 return ret, conf
         else:
             if item in line:
-                ret, conf = warn_count('syntax',
-                                       oline,
-                                       conf,
-                                       strict=strict,
-                                       ssh=ssh)
+                ret, conf = warn_count('syntax', oline, conf, strict=strict, ssh=ssh)
                 return ret, conf
 
     # check if the line contains $(foo) executions, and check them
@@ -288,11 +267,7 @@ def check_secure(line, conf, strict=None, ssh=None):
                 else:
                     sudocmd = cmdargs[1]
                 if sudocmd not in conf['sudo_commands'] and cmdargs:
-                    ret, conf = warn_count('sudo command',
-                                           oline,
-                                           conf,
-                                           strict=strict,
-                                           ssh=ssh)
+                    ret, conf = warn_count('sudo command', oline, conf, strict=strict, ssh=ssh)
                     return ret, conf
 
         # if over SSH, replaced allowed list with the one of overssh
@@ -302,10 +277,6 @@ def check_secure(line, conf, strict=None, ssh=None):
         # for all other commands check in allowed list
         if 'all' not in conf['allowed']:
             if command not in conf['allowed'] and command:
-                ret, conf = warn_count('command',
-                                       command,
-                                       conf,
-                                       strict=strict,
-                                       ssh=ssh)
+                ret, conf = warn_count('command', command, conf, strict=strict, ssh=ssh)
                 return ret, conf
     return 0, conf

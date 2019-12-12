@@ -106,7 +106,8 @@ class ShellCmd(cmd.Cmd, object):
             if self.conf['disable_exit'] != 1:
                 # 修复disable_exit没有实现
                 self.retcode = 126
-                self.stdout.write('forbidden command: exit , disable_exit is open,please close browser or close shell')
+                self.stdout.write(
+                    'forbidden command: exit , disable_exit is open,please close browser or close shell\n')
                 return object.__getattribute__(self, attr)
 
         # check that commands/chars present in line are allowed/secure
