@@ -131,7 +131,7 @@ class ShellCmd(cmd.Cmd, object):
                 utils.exec_cmd('echo "WinSCP: this is end-of-file: %s"' % self.retcode)
             return object.__getattribute__(self, attr)
 
-        if self.g_cmd in self.conf['allowed']:
+        if self.g_cmd in self.conf['allowed'] or 'all' in self.conf['allowed']:
             if self.conf['timer'] > 0:
                 self.mytimer(0)
             self.g_arg = re.sub('^~$|^~/', '%s/' % self.conf['home_path'],
@@ -198,7 +198,7 @@ class ShellCmd(cmd.Cmd, object):
 
         elif self.g_cmd not in ['', '?', 'help', None]:
             self.log.warn('INFO: unknown syntax -> "%s"' % self.g_line)
-            self.stderr.write('*** unknown syntax: %s\n' % self.g_cmd)
+            self.stderr.write('*** forbidden command: %s\n' % self.g_cmd)
         self.g_cmd, self.g_arg, self.g_line = ['', '', '']
         if self.conf['timer'] > 0:
             self.mytimer(self.conf['timer'])
